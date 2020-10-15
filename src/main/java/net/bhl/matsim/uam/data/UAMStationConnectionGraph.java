@@ -38,6 +38,7 @@ public class UAMStationConnectionGraph {
 		//TODO: For now it assumes there only being one singular UAM vehicle type, enhancing this would be part of future work.
 		double horizontalSpeed = uamManager.getVehicles().entrySet().iterator().next().getValue().getCruiseSpeed();
 		double verticalSpeed = uamManager.getVehicles().entrySet().iterator().next().getValue().getVerticalSpeed();
+		double diagonalSpeed = uamManager.getVehicles().entrySet().iterator().next().getValue().getDiagonalSpeed();
 
 		for (UAMStation uamStationOrigin : uamManager.getStations().getUAMStations().values()) {
 			for (UAMStation uamStationDestination : uamManager.getStations().getUAMStations().values()) {
@@ -70,6 +71,9 @@ public class UAMStationConnectionGraph {
 
 					if (flightSegment.equals(UAMFlightSegments.VERTICAL))
 						travelTime += link.getLength() / min(verticalSpeed, link.getFreespeed());
+
+					if (flightSegment.equals(UAMFlightSegments.DIAGONAL))
+						travelTime += link.getLength() / min(diagonalSpeed, link.getFreespeed());
 				}
 
 				if (legs.containsKey(uamStationOrigin.getId())) {

@@ -34,7 +34,8 @@ import java.util.Set;
  *
  * @author balacmi (Milos Balac), RRothfeld (Raoul Rothfeld)
  */
-public class RunUAMScenario {
+public class
+RunUAMScenario {
 
 	private static UAMConfigGroup uamConfigGroup;
 	private static CommandLine cmd;
@@ -130,7 +131,7 @@ public class RunUAMScenario {
 
 		controler.addOverridingModule(new UAMModule(uamManager, networkUAM, networkCar, uamReader));
 		controler.addOverridingModule(new UAMSpeedModule(uamReader.getMapVehicleVerticalSpeeds(),
-				uamReader.getMapVehicleHorizontalSpeeds()));
+				uamReader.getMapVehicleHorizontalSpeeds(), uamReader.getMapVehicleDiagonalSpeeds()));
 		controler.addOverridingModule(new DvrpTravelTimeModule());
 
 		controler.configureQSimComponents(configurator -> {

@@ -14,17 +14,19 @@ public class UAMVehicleType {
 	private final double range; // [m]
 	private final double cruiseSpeed; // [m/s]
 	private final double verticalSpeed; // [m/s]
+	private final double diagonalSpeed; // [m/s]
 	private final double boardingTime; // [s]
 	private final double deboardingTime; // [s]
 	private final double turnAroundTime; // [s]
 
 	public UAMVehicleType(Id<UAMVehicleType> id, int capacity, double range, double cruiseSpeed, double verticalSpeed,
-						  double boardingTime, double deboardingTime, double turnAroundTime) {
+						  double diagonalSpeed, double boardingTime, double deboardingTime, double turnAroundTime) {
 		this.id = id;
 		this.capacity = capacity;
 		this.range = range;
 		this.cruiseSpeed = cruiseSpeed;
 		this.verticalSpeed = verticalSpeed;
+		this.diagonalSpeed = diagonalSpeed;
 		this.boardingTime = boardingTime;
 		this.deboardingTime = deboardingTime;
 		this.turnAroundTime = turnAroundTime;
@@ -45,6 +47,8 @@ public class UAMVehicleType {
 	public double getVerticalSpeed() {
 		return this.verticalSpeed;
 	}
+
+	public double getDiagonalSpeed() { return this.verticalSpeed; }
 
 	public double getboardingTime() {
 		return this.boardingTime;

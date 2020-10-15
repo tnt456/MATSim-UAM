@@ -50,6 +50,14 @@ public class UAMVehicle extends DvrpVehicleImpl {
 	}
 
 	/**
+	 * This method is used to retrieve the vehicle diagonal speed during take-off
+	 * and landing.
+	 *
+	 * @return vehicle diagonal speed in meter/second
+	 */
+	public double getDiagonalSpeed() { return  vehicleType.getDiagonalSpeed(); }
+
+	/**
 	 * This method is used to retrieve the Time for the passenger to board in the
 	 * aircraft in seconds. Used in the <code>UAMPickUpTask</code>.
 	 *

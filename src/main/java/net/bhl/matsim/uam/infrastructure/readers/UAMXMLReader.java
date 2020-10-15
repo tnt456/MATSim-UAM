@@ -1,13 +1,13 @@
 package net.bhl.matsim.uam.infrastructure.readers;
 
 import com.google.common.collect.ImmutableMap;
+import com.sun.media.jai.util.CaselessStringKeyHashtable;
 import net.bhl.matsim.uam.infrastructure.UAMStation;
 import net.bhl.matsim.uam.infrastructure.UAMStationSimple;
 import net.bhl.matsim.uam.infrastructure.UAMVehicle;
 import net.bhl.matsim.uam.infrastructure.UAMVehicleType;
 import net.bhl.matsim.uam.run.UAMConstants;
 import org.jfree.util.Log;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,8 +40,9 @@ public class UAMXMLReader extends MatsimXmlParser {
     private final Map<String, Double> mapVehicleHorizontalSpeeds = new HashMap<>();
     private final Map<String, Double> mapVehicleVerticalSpeeds = new HashMap<>();
     private final FleetSpecificationImpl fleetSpecification = new FleetSpecificationImpl();
+    private final Map<String, Double> mapVehicleDiagonalSpeeds = new HashMap<>();
 
-    public UAMXMLReader(Network uamNetwork) {
+	public UAMXMLReader(Network uamNetwork) {
         this.network = uamNetwork;
     }
 
@@ -77,6 +78,7 @@ public class UAMXMLReader extends MatsimXmlParser {
 				double range = Double.parseDouble(atts.getValue("range"));
 				double horizontalSpeed = Double.parseDouble(atts.getValue("cruisespeed"));
 				double verticalSpeed = Double.parseDouble(atts.getValue("verticalspeed"));
+				double diagonalSpeed = Double.parseDouble(atts.getValue("diagonalspeed"));
 
 				// Get vehicle type attributes: boardingTime, deboardingTime and turnAroundTime
 				double boardingTime = Double.parseDouble(atts.getValue("boardingtime"));
@@ -84,7 +86,7 @@ public class UAMXMLReader extends MatsimXmlParser {
 				double turnAroundTime = Double.parseDouble(atts.getValue("turnaroundtime"));
 
 				UAMVehicleType vehicleType = new UAMVehicleType(id, capacity, range, horizontalSpeed, verticalSpeed,
-						boardingTime, deboardingTime, turnAroundTime);
+                        diagonalSpeed, boardingTime, deboardingTime, turnAroundTime);
 				vehicleTypes.put(id, vehicleType);
 				break;
 			}
@@ -103,10 +105,12 @@ public class UAMXMLReader extends MatsimXmlParser {
 				// liftofftime, width, length, range);
 				double horizontalSpeed = vehicleTypes.get(vehicleTypeId).getCruiseSpeed();
 				double verticalSpeed = vehicleTypes.get(vehicleTypeId).getVerticalSpeed();
+				double diagonalSpeed = vehicleTypes.get(vehicleTypeId).getDiagonalSpeed();
 				int capacity = vehicleTypes.get(vehicleTypeId).getCapacity();
 
 				this.mapVehicleVerticalSpeeds.put(id.toString(), verticalSpeed);
 				this.mapVehicleHorizontalSpeeds.put(id.toString(), horizontalSpeed);
+				this.mapVehicleDiagonalSpeeds.put(id.toString(), diagonalSpeed);
 
 				try {
 					if (vehicles.containsKey(id)) {
@@ -158,6 +162,8 @@ public class UAMXMLReader extends MatsimXmlParser {
     public Map<String, Double> getMapVehicleVerticalSpeeds() {
         return this.mapVehicleVerticalSpeeds;
     }
+
+    public Map<String, Double> getMapVehicleDiagonalSpeeds() { return this.mapVehicleDiagonalSpeeds; }
 
     public FleetSpecificationImpl getFleetSpecification() {
         return this.fleetSpecification;

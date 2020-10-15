@@ -563,7 +563,7 @@
 	</module>
 	<module name="uam" >
 		<param name="availableAccessModes" value="[car, walk]" />
-		<param name="inputUAMFile" value="uam_vehicles.xml.gz" />
+		<param name="inputUAMFile" value="uam_vehicles.xml" />
 		<param name="parallelRouters" value="2" />
 		<param name="ptSimulation" value="true" />
 		<param name="routingStrategy" value="MINTRAVELTIME" />

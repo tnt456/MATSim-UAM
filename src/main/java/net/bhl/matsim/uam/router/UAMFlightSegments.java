@@ -14,4 +14,5 @@ public class UAMFlightSegments {
 
 	public static final String HORIZONTAL = UAMConstants.uam + "_horizontal";
 	public static final String VERTICAL = UAMConstants.uam + "_vertical";
+	public static final String DIAGONAL = UAMConstants.uam + "_diagonal";
 }

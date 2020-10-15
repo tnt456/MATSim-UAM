@@ -16,14 +16,16 @@ public class UAMLinkSpeedCalculator implements LinkSpeedCalculator {
 
 	final private Map<String, Double> mapVehicleVerticalSpeeds;
 	final private Map<String, Double> mapVehicleHorizontalSpeeds;
+	final private Map<String, Double> mapVehicleDiagonalSpeeds;
 
 	final private LinkSpeedCalculator delegate;
 
 	public UAMLinkSpeedCalculator(Map<String, Double> mapVehicleVerticalSpeeds,
-								  Map<String, Double> mapVehicleHorizontalSpeeds, LinkSpeedCalculator delegate) {
+								  Map<String, Double> mapVehicleHorizontalSpeeds, Map<String, Double> mapVehicleDiagonalSpeeds, LinkSpeedCalculator delegate) {
 		// TODO: Use mapping of vehicle types instead of vehicles themselves.
 		this.mapVehicleVerticalSpeeds = mapVehicleVerticalSpeeds;
 		this.mapVehicleHorizontalSpeeds = mapVehicleHorizontalSpeeds;
+		this.mapVehicleDiagonalSpeeds = mapVehicleDiagonalSpeeds;
 
 		this.delegate = delegate;
 	}
@@ -38,6 +40,9 @@ public class UAMLinkSpeedCalculator implements LinkSpeedCalculator {
 
 			if (flightSegment.equals(UAMFlightSegments.VERTICAL))
 				return Math.min(link.getFreespeed(), this.mapVehicleVerticalSpeeds.get(vehicle.getId().toString()));
+
+			if (flightSegment.equals(UAMFlightSegments.DIAGONAL))
+				return Math.min(link.getFreespeed(),this.mapVehicleDiagonalSpeeds.get(vehicle.getId().toString()));
 		} catch (NullPointerException e) {
 			// Non-flight link
 		}

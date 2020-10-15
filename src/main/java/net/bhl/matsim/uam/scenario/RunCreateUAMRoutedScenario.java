@@ -6,6 +6,7 @@ import net.bhl.matsim.uam.router.UAMFlightSegments;
 import net.bhl.matsim.uam.router.strategy.UAMStrategy;
 import net.bhl.matsim.uam.run.UAMConstants;
 import net.bhl.matsim.uam.scenario.utils.ConfigAddUAMParameters;
+//import org.graalvm.compiler.graph.Graph;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,8 +60,10 @@ public class RunCreateUAMRoutedScenario {
 	private static final String name_uam_station_link = UAMConstants.uam + "_sl-";
 	private static final String name_uam_vertical_link = UAMConstants.uam + "_vl-";
 	private static final String name_uam_horizontal_link = UAMConstants.uam + "_hl-";
+	private static final String name_uam_diagonal_link = UAMConstants.uam + "_dl-";
 	private static final String name_uam_station_ground_access = "_ga";
 	private static final String name_uam_station_flight_access = "_fa";
+	private static final String name_uam_station_clearence_level = "_cl-";
 	private static final String name_uam_station_flight_level = "_fl";
 
 	private static final String name_uam_dtd = "src/main/resources/dtd/uam.dtd";
@@ -74,6 +77,9 @@ public class RunCreateUAMRoutedScenario {
 	private static double uamMaxLinkSpeed = -1;
 	private static double uamLinkCapacity = -1;
 
+	private static final double clearence_level = 400;
+	private static double cruise_level = 600;
+
 	public static void main(String[] args) {
 		System.out.println("ARGS: config.xml* uam-stations.csv* flight-nodes.csv* flight-links.csv* uam-vehicles.csv");
 		System.out.println("(* required)");
@@ -82,8 +88,8 @@ public class RunCreateUAMRoutedScenario {
 		int j = 0;
 		String configInput = args[j++];
 		String stationInput = args[j++];
-		String nodesInput = args[j++];
-		String linksInput = args[j++];
+		String nodesInput = null;
+		String linksInput = null;
 		String vehicleInput = null;
 
 		if (args.length > j)
@@ -154,24 +160,106 @@ public class RunCreateUAMRoutedScenario {
 			}
 		} else {
 			// DIRECT FLIGHT BETWEEN ALL STATIONS
-			// create flight level accesses
+			// create clearence level accesses
 			List<Id<Node>> flightAccesses = new ArrayList<>();
 			for (String[] line : Iterables.skip(stations, 1)) { // skip CSV header
-				Id<Node> node_id = Id.createNodeId(name_uam_nodes + line[0] + name_uam_station_flight_level);
+				Id<Node> node_id = Id.createNodeId(name_uam_nodes + line[0] + name_uam_station_clearence_level);
 				double node_x = Double.parseDouble(line[2]);
 				double node_y = Double.parseDouble(line[3]);
-				double node_z = Double.parseDouble(line[5]);
+				double node_z = clearence_level;
 
 				addNode(network, node_id, node_x, node_y, node_z);
 				flightAccesses.add(node_id);
 			}
 
-			// connect flight accesses
+			// create cruise level nodes
+			List<Id<Node>> cruiseLevelNodes = new ArrayList<>();
 			for (int i = 0; i < flightAccesses.size(); i++) {
-				for (int k = i + 1; k < flightAccesses.size(); k++) {
+				for (int k = 0; k < flightAccesses.size(); k++) {
+
+					if(i == k)
+						continue;
 
 					Id<Node> to = flightAccesses.get(i);
 					Id<Node> from = flightAccesses.get(k);
+
+					Id<Node> node_id = Id.createNodeId(from.toString() + to.toString() + name_uam_station_flight_level);
+
+					Map<Id<Node>, ? extends Node> Nodes = network.getNodes();
+					Coord fromCoords = Nodes.get(from).getCoord();
+					Coord toCoords = Nodes.get(to).getCoord();
+
+					double newX = toCoords.getX() - fromCoords.getX();
+					double newY = toCoords.getY() - fromCoords.getY();
+					double nodeX,nodeY,nodeZ = cruise_level;
+					if(newX != 0 && newY != 0){
+						double ratio = newY/newX;
+
+						final int targetDistance = 10; // 200^2 for not having to calculate the squareroot
+						double xdiff = 0,ydiff = 0,distance = 0;
+						while((targetDistance - distance) > 0.5 ){
+							xdiff += 0.1;
+							ydiff += 0.1* ratio;
+							distance = xdiff * xdiff + ydiff * ydiff;
+						}
+
+						nodeX = fromCoords.getX()+xdiff;
+						nodeY = fromCoords.getY()+ydiff;
+
+
+					} else if(newX > 0 && newY == 0){
+						nodeX = fromCoords.getX() + 200;
+						nodeY = fromCoords.getY();
+					} else if(newX < 0 && newY == 0){
+						nodeX = fromCoords.getX() - 200;
+						nodeY = fromCoords.getY();
+					} else if(newX == 0 && newY > 0){
+						nodeX = fromCoords.getX();
+						nodeY = fromCoords.getY() + 200;
+					} else if(newX == 0 && newY < 0){
+						nodeX = fromCoords.getX();
+						nodeY = fromCoords.getY() - 200;
+					} else {
+						nodeX = Double.parseDouble(null);
+						nodeY = Double.parseDouble(null);
+					}
+					addNode(network,node_id,nodeX,nodeY,nodeZ);
+					cruiseLevelNodes.add(node_id);
+				}
+			}
+
+			//connect clearence level to cruise level nodes
+			for(int i = 0; i < flightAccesses.size();i++){
+				for(int k = 0; k < cruiseLevelNodes.size();k++) {
+					Id<Node> to = cruiseLevelNodes.get(k);
+					Id<Node> from = flightAccesses.get(i);
+
+					if (to.toString().contains(from.toString())) {
+
+						Set<String> mode = new HashSet<>();
+						mode.add(UAMConstants.uam);
+
+						addLink(network, to, from, mode);
+						addLink(network, from, to, mode);
+					}
+				}
+			}
+
+			// connect Cruise Level Nodes
+			for (int i = 0; i < cruiseLevelNodes.size(); i++) {
+				for (int k = i + 1; k < cruiseLevelNodes.size(); k++) {
+
+					Id<Node> to = cruiseLevelNodes.get(i);
+					Id<Node> from = cruiseLevelNodes.get(k);
+
+					char[] t = to.toString().toLowerCase().toCharArray();
+					char[] f = from.toString().toLowerCase().toCharArray();
+
+					Arrays.sort(t);
+					Arrays.sort(f);
+
+					if(!Arrays.equals(t,f))
+						continue;
 
 					Set<String> mode = new HashSet<>();
 					mode.add(UAMConstants.uam);
@@ -269,14 +357,17 @@ public class RunCreateUAMRoutedScenario {
 		path += "\\" + UAMConstants.uam + "-scenario_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm").format(new Date());
 		new File(path).mkdir();
 
+
+
 		// WRITE STATION DISTANCE CSV
+		/*
 		try {
 			calculateStationDistances(network, stationIDs, path + "\\" + UAMConstants.uam + "_distances.csv");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-
+	*/
 		// ADD UAM VEHICLES
 		String vehiclesFileName = "<REPLACE WITH UAM VEHICLES FILE NAME>";
 		if (vehicleInput != null) {
@@ -331,7 +422,6 @@ public class RunCreateUAMRoutedScenario {
 				// calculate distance
 				Future<Path> path = router.calcLeastCostPath(networkUAM.getNodes().get(uamStationOrigin),
 						networkUAM.getNodes().get(uamStationDestination), 0.0, null, null);
-
 				double cruisedistance = 0;
 				double vtoldistance = 0;
 				for (Link link : path.get().links) {
@@ -387,6 +477,7 @@ public class RunCreateUAMRoutedScenario {
 		Id<Link> id;
 		boolean vertical = false;
 		boolean horizontal = false;
+		boolean diagonal = false;
 		String f = from.toString();
 		String t = to.toString();
 
@@ -408,6 +499,12 @@ public class RunCreateUAMRoutedScenario {
 				|| (!f.endsWith(name_uam_station_ground_access) && t.endsWith(name_uam_station_ground_access))) {
 			// ground access link
 			id = Id.createLinkId(name_uam_ground_link + from + "-" + to);
+			vertical = true;
+		} else if((f.endsWith(name_uam_station_clearence_level) && t.endsWith(name_uam_station_flight_level)
+				|| (f.endsWith(name_uam_station_flight_level) && t.endsWith(name_uam_station_clearence_level)))) {
+			// diagonal Link
+			id = Id.createLinkId(name_uam_diagonal_link + from + "-" + to);
+			diagonal = true;
 		} else {
 			System.err.println("WARN: Unknown link type for link between nodes: " + from.toString()
 					+ " and " + to.toString());
@@ -430,6 +527,9 @@ public class RunCreateUAMRoutedScenario {
 
 		if (horizontal)
 			link.getAttributes().putAttribute(UAMFlightSegments.ATTRIBUTE, UAMFlightSegments.HORIZONTAL);
+
+		if(diagonal)
+			link.getAttributes().putAttribute(UAMFlightSegments.ATTRIBUTE, UAMFlightSegments.DIAGONAL);
 
 		try {
 			network.addLink(link);

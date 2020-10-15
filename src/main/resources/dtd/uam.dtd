@@ -11,7 +11,8 @@
 					name 			CDATA	#IMPLIED
 					preflighttime	CDATA	#REQUIRED
 					postflighttime	CDATA	#REQUIRED
-					defaultwaittime	CDATA	#REQUIRED>
+					defaultwaittime	CDATA	#REQUIRED
+					landingcap		CDATA	#REQUIRED>
 					
 <!ELEMENT vehicleType EMPTY>
 <!ATTLIST vehicleType	id				CDATA	#REQUIRED
@@ -21,7 +22,8 @@
 						verticalspeed	CDATA	#REQUIRED
 						turnaroundtime	CDATA	#REQUIRED
 						boardingtime	CDATA	#REQUIRED
-						deboardingtime	CDATA	#REQUIRED>
+						deboardingtime	CDATA	#REQUIRED
+						diagonalspeed 	CDATA	#REQUIRED>
 
 <!ELEMENT vehicle EMPTY>
 <!ATTLIST vehicle	id				CDATA	#REQUIRED
