@@ -50,7 +50,7 @@ import java.util.concurrent.Future;
  */
 public class RunCreateUAMRoutedScenario {
 	// SETTINGS
-	private static final boolean useZCoordinate = false; // default: false, i.e. use pseudo-3D (i.e. 2D) network
+	private static final boolean useZCoordinate = true; // default: false, i.e. use pseudo-3D (i.e. 2D) network
 	private static final double detourFactor = 1.0; // default: 1.0, i.e. no detour from link distance
 
 	// LATERALS
@@ -328,8 +328,8 @@ public class RunCreateUAMRoutedScenario {
 
 			// add station nodes to network (after access node search, since search for
 			// closest node would return station nodes)
-			addNode(network, node_ga_id, station_x, station_y, station_z);
-			addNode(network, node_fa_id, station_x, station_y, station_z);
+			addNode(network, node_ga_id, station_x, station_y, station_z+1);
+			addNode(network, node_fa_id, station_x, station_y, station_z+2);
 
 			// station links
 			Set<String> modes = new HashSet<>();
@@ -360,14 +360,14 @@ public class RunCreateUAMRoutedScenario {
 
 
 		// WRITE STATION DISTANCE CSV
-		/*
+
 		try {
 			calculateStationDistances(network, stationIDs, path + "\\" + UAMConstants.uam + "_distances.csv");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-	*/
+
 		// ADD UAM VEHICLES
 		String vehiclesFileName = "<REPLACE WITH UAM VEHICLES FILE NAME>";
 		if (vehicleInput != null) {

@@ -2,29 +2,29 @@
 <!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
 <network name="test-scenario">
 	<nodes>
-		<node id="00" x="0.0" y="0.0" >
+		<node id="00" x="0.0" y="0.0" z="0.0">
 		</node>
-		<node id="01" x="10.0" y="0.0" >
+		<node id="01" x="10.0" y="0.0" z="0.0">
 		</node>
-		<node id="02" x="5010.0" y="0.0" >
+		<node id="02" x="5010.0" y="0.0" z="0.0">
 		</node>
-		<node id="03" x="5020.0" y="0.0" >
+		<node id="03" x="5020.0" y="0.0" z="0.0">
 		</node>
-		<node id="04A" x="6020.0" y="500.0" >
+		<node id="04A" x="6020.0" y="500.0" z="0.0">
 		</node>
-		<node id="04B" x="6020.0" y="-500.0" >
+		<node id="04B" x="6020.0" y="-500.0" z="0.0">
 		</node>
-		<node id="06A" x="14020.0" y="500.0" >
+		<node id="06A" x="14020.0" y="500.0" z="0.0">
 		</node>
-		<node id="06B" x="14020.0" y="-500.0" >
+		<node id="06B" x="14020.0" y="-500.0" z="0.0">
 		</node>
-		<node id="07" x="15020.0" y="0.0" >
+		<node id="07" x="15020.0" y="0.0" z="0.0">
 		</node>
-		<node id="08" x="15030.0" y="0.0" >
+		<node id="08" x="15030.0" y="0.0" z="0.0">
 		</node>
-		<node id="09" x="20030.0" y="0.0" >
+		<node id="09" x="20030.0" y="0.0" z="0.0">
 		</node>
-		<node id="10" x="20040.0" y="0.0" >
+		<node id="10" x="20040.0" y="0.0" z="0.0">
 		</node>
 	</nodes>
 
