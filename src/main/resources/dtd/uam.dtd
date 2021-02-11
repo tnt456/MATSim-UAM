@@ -11,8 +11,7 @@
 					name 			CDATA	#IMPLIED
 					preflighttime	CDATA	#REQUIRED
 					postflighttime	CDATA	#REQUIRED
-					defaultwaittime	CDATA	#REQUIRED
-					landingcap		CDATA	#REQUIRED>
+					defaultwaittime	CDATA	#REQUIRED>
 					
 <!ELEMENT vehicleType EMPTY>
 <!ATTLIST vehicleType	id				CDATA	#REQUIRED

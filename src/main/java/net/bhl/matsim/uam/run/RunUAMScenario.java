@@ -34,8 +34,7 @@ import java.util.Set;
  *
  * @author balacmi (Milos Balac), RRothfeld (Raoul Rothfeld)
  */
-public class
-RunUAMScenario {
+public class RunUAMScenario {
 
 	private static UAMConfigGroup uamConfigGroup;
 	private static CommandLine cmd;
@@ -57,9 +56,9 @@ RunUAMScenario {
 					.allowOptions("config-path")
 					.build();
 
-			if (cmd.hasOption("config-path"))
+			if (cmd.hasOption("config-path")) {
 				path = cmd.getOption("config-path").get();
-			else
+			} else
 				path = args[0];
 		} catch (ConfigurationException e) {
 			e.printStackTrace();

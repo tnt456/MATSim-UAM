@@ -29,71 +29,97 @@
         </repository>
     </repositories>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.10</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <downloadJavadocs>true</downloadJavadocs>
+                </configuration>
+            </plugin>
 
-    <profiles>
-        <profile>
-            <id>zip</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <version>3.2.0</version>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*$*</exclude> <!-- exclude all inner classes -->
+                        <exclude>org/matsim/testcases/TestDepth.java</exclude>
+                        <exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
+                    </excludes>
+                    <forkMode>once</forkMode>
+                    <!-- avoid out of memory errors: -->
+                    <argLine>-Xmx6000m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
+                    <!--necessary in tu berlin gitlab. BUT not good in other places, so solve by command line switch only where needed.  kai, nov'18-->
+                    <!--<useSystemClassLoader>false</useSystemClassLoader>-->
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
                         <configuration>
-                            <descriptors>
-                                <descriptor>src/main/assembly/assembly-release.xml</descriptor>
-                            </descriptors>
+                            <outputFile>${project.basedir}/target/${project.build.finalName}-shaded.jar</outputFile>
+                            <transformers>
+                                <!-- This bit sets the main class for the executable jar as you otherwise would with the assembly plugin -->
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>net.bhl.matsim.uam.run.RunUAMScenario</Main-Class>
+                                        <Specification-Vendor>org.matsim</Specification-Vendor>
+                                        <Implementation-Vendor>org.matsim</Implementation-Vendor>
+                                        <Implementation-Version>${project.version}</Implementation-Version>
+                                    </manifestEntries>
+                                </transformer>
+                                <!-- This bit merges the various GeoTools META-INF/services files         -->
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>make-assembly</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>jar</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <version>3.2.0</version>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>make-assembly</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>single</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>  <!-- Create sources.jar -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
 
     <dependencies>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.6</version>
-        </dependency>
         <dependency>
             <groupId>org.matsim</groupId>
             <artifactId>matsim</artifactId>
             <version>${matsim.version}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+
         <dependency>
             <groupId>ch.ethz.matsim</groupId>
             <artifactId>baseline_scenario</artifactId>

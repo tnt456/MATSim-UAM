@@ -6,7 +6,6 @@ import net.bhl.matsim.uam.router.UAMFlightSegments;
 import net.bhl.matsim.uam.router.strategy.UAMStrategy;
 import net.bhl.matsim.uam.run.UAMConstants;
 import net.bhl.matsim.uam.scenario.utils.ConfigAddUAMParameters;
-//import org.graalvm.compiler.graph.Graph;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -88,8 +87,8 @@ public class RunCreateUAMRoutedScenario {
 		int j = 0;
 		String configInput = args[j++];
 		String stationInput = args[j++];
-		String nodesInput = null;
-		String linksInput = null;
+		String nodesInput = args[j++];
+		String linksInput = args[j++];
 		String vehicleInput = null;
 
 		if (args.length > j)
@@ -499,7 +498,7 @@ public class RunCreateUAMRoutedScenario {
 				|| (!f.endsWith(name_uam_station_ground_access) && t.endsWith(name_uam_station_ground_access))) {
 			// ground access link
 			id = Id.createLinkId(name_uam_ground_link + from + "-" + to);
-			vertical = true;
+
 		} else if((f.endsWith(name_uam_station_clearence_level) && t.endsWith(name_uam_station_flight_level)
 				|| (f.endsWith(name_uam_station_flight_level) && t.endsWith(name_uam_station_clearence_level)))) {
 			// diagonal Link
